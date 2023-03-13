@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSearchByKeyword } from "../service/osScript";
+import { getSearchByKeyword } from "../service/foneApi";
 import { Task } from "../service/task";
 
 type Props = {

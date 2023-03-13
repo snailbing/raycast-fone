@@ -1,5 +1,5 @@
 import { ActionPanel, Form, Icon, showToast, Toast, Action, popToRoot, Clipboard, getPreferenceValues } from "@raycast/api";
-import { createTask, Preferences } from "./service/osScript";
+import { createTask, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 
 const { projectId } = getPreferenceValues<Preferences>();

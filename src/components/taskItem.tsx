@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
 import { useMemo } from "react";
-import { changTaskState } from "../service/osScript";
+import { changTaskState } from "../service/foneApi";
 import { Task } from "../service/task";
 import { addSpaceBetweenEmojiAndText } from "../utils/text";
 

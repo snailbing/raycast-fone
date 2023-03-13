@@ -1,4 +1,4 @@
-import { getProjects as getProjectsFromFone } from "./osScript";
+import { getProjects as getProjectsFromFone } from "./foneApi";
 
 export interface Project {
   id: string;

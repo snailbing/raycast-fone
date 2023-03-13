@@ -1,6 +1,6 @@
 import { List } from "@raycast/api";
 import React, { useEffect, useMemo, useState } from "react";
-import { getToday } from "./service/osScript";
+import { getToday } from "./service/foneApi";
 import { getTaskCopyContent, getTaskDetailMarkdownContent, Task } from "./service/task";
 import useStartApp from "./hooks/useStartApp";
 import TaskItem from "./components/taskItem";

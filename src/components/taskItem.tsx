@@ -14,8 +14,9 @@ const TaskItem: React.FC<{
   state: Task["state"]["label"];
   detailMarkdown: string;
   copyContent: string;
+  onTaskFinish: any;
 }> = (props) => {
-  const { id, title, priority, projectId, bizProjectName, bizProjectId, detailMarkdown, state, copyContent } = props;
+  const { id, title, priority, projectId, bizProjectName, detailMarkdown, state, copyContent, onTaskFinish } = props;
 
   const checkboxColor = useMemo(() => {
     switch (priority) {
@@ -61,6 +62,7 @@ const TaskItem: React.FC<{
         toast.style = Toast.Style.Success;
         toast.title = "Finish Task";
         // toast.message = "Copied link to clipboard";
+        return true;
       } else {
         toast.style = Toast.Style.Failure;
         toast.title = "Failed finish Task";
@@ -71,6 +73,7 @@ const TaskItem: React.FC<{
       toast.title = "Failed finish Task";
       toast.message = String(error);
     }
+    return false;
   }
 
   return (
@@ -81,7 +84,15 @@ const TaskItem: React.FC<{
         <ActionPanel>
           <Action.OpenInBrowser title="打开" url={target} icon={Icon.Eye} />
           <Action.CopyToClipboard title="Copy" content={copyContent} icon={Icon.Clipboard} />
-          <Action title="完成" icon={Icon.Circle} onAction={() => taskFinish(props)} />
+          <Action
+            title="完成"
+            icon={Icon.Circle}
+            onAction={() => {
+              onTaskFinish(false);
+              const b = taskFinish(props);
+              onTaskFinish(b);
+            }}
+          />
         </ActionPanel>
       }
       accessoryTitle={addSpaceBetweenEmojiAndText(bizProjectName)}

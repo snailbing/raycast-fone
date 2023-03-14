@@ -10,6 +10,7 @@ const FoneTasks: React.FC<Record<string, never>> = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [todaySections, setTodaySections] = useState<Task[] | null>(null);
   const { isInitCompleted } = useStartApp();
+  const [isTaskFinish, setIsTaskFinish] = useState<boolean>(false);
 
   useEffect(() => {
     const getTodayTasks = async () => {
@@ -21,6 +22,17 @@ const FoneTasks: React.FC<Record<string, never>> = () => {
       getTodayTasks();
     }
   }, [isInitCompleted]);
+
+  useEffect(() => {
+    const getTodayTasks = async () => {
+      const today = await getToday();
+      setTodaySections(today);
+    };
+
+    if (isTaskFinish) {
+      getTodayTasks();
+    }
+  }, [isTaskFinish]);
 
   const { searchTasks, isSearching } = useSearchTasks({ searchQuery, isInitCompleted });
 
@@ -55,6 +67,7 @@ const FoneTasks: React.FC<Record<string, never>> = () => {
               state={task.state}
               detailMarkdown={getTaskDetailMarkdownContent(task)}
               copyContent={getTaskCopyContent(task)}
+              onTaskFinish={setIsTaskFinish}
             />
           ))
         : todaySections?.map((task) => (
@@ -69,6 +82,7 @@ const FoneTasks: React.FC<Record<string, never>> = () => {
               state={task.state}
               detailMarkdown={getTaskDetailMarkdownContent(task)}
               copyContent={getTaskCopyContent(task)}
+              onTaskFinish={setIsTaskFinish}
             />
           ))}
     </List>

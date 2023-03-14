@@ -1,8 +1,43 @@
-import { ActionPanel, Form, Icon, showToast, Toast, Action, Clipboard, getPreferenceValues, closeMainWindow, PopToRootType } from "@raycast/api";
+import {
+  ActionPanel,
+  Form,
+  Icon,
+  showToast,
+  Toast,
+  Action,
+  Clipboard,
+  getPreferenceValues,
+  closeMainWindow,
+  PopToRootType,
+} from "@raycast/api";
 import { createTask, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 
 const { projectId } = getPreferenceValues<Preferences>();
+
+const projectDic = new Map<string, string>([
+  ["21005", "浙一项目-金刚电子病历"],
+  ["32006", "富阳中医骨伤项目/大HIS"],
+  ["17040", "余杭二院、三院、良渚医院数据及业务中台项目"],
+  ["17014", "上海中山项目--老年医学中心项目"],
+  ["25001", "上海中山佘山院区项目"],
+  ["17018", "来未来&熙牛"],
+]);
+
+const productDic = new Map<string, string>([
+  ["35005", "金刚电子病历"],
+  ["17011", "护理中心"],
+  ["17021", "住院"],
+  ["16001", "HBOS"],
+]);
+
+const gnNode = (myMap: Map<string, string>) => {
+  let nodes: React.ReactNode[] = [];
+  myMap.forEach((value, key) => {
+    nodes.push(<Form.Dropdown.Item key={key} value={key} title={value} />);
+  });
+  return nodes;
+};
 
 export default function Command() {
   return (
@@ -19,40 +54,18 @@ export default function Command() {
     >
       <Form.TextField id="title" title="标题" placeholder="Enter task title ..." />
 
-      <Form.Dropdown id="project" title="所属项目" storeValue>
-        <Form.Dropdown.Item value="21005" title="浙一项目-金刚电子病历" />
-        <Form.Dropdown.Item value="32006" title="富阳中医骨伤项目/大HIS" />
-        <Form.Dropdown.Item value="17040" title="余杭二院、三院、良渚医院数据及业务中台项目" />
-        <Form.Dropdown.Item value="17014" title="上海中山项目--老年医学中心项目" />
-        <Form.Dropdown.Item value="25001" title="上海中山佘山院区项目" />
+      <Form.Dropdown id="project" title="所属项目" storeValue={true}>
+        {gnNode(projectDic)}
       </Form.Dropdown>
 
-      <Form.Dropdown id="product" title="所属产品模块" storeValue>
-        <Form.Dropdown.Item value="35005" title="金刚电子病历" />
-        <Form.Dropdown.Item value="17011" title="护理中心" />
-        <Form.Dropdown.Item value="17021" title="住院" />
-        <Form.Dropdown.Item value="16001" title="HBOS" />
+      <Form.Dropdown id="product" title="所属产品模块" storeValue={true}>
+        {gnNode(productDic)}
       </Form.Dropdown>
 
       <Form.TextArea id="description" title="内容" placeholder="Enter task content ..." />
     </Form>
   );
 }
-
-const projectDic = new Map<string, string>([
-  ["21005", "浙一项目-金刚电子病历"],
-  ["32006", "富阳中医骨伤项目/大HIS"],
-  ["17040", "余杭二院、三院、良渚医院数据及业务中台项目"],
-  ["17014", "上海中山项目--老年医学中心项目"],
-  ["25001", "上海中山佘山院区项目"],
-]);
-
-const productDic = new Map<string, string>([
-  ["35005", "金刚电子病历"],
-  ["17011", "护理中心"],
-  ["17021", "住院"],
-  ["16001", "HBOS"],
-]);
 
 function CreateTaskAction() {
   async function handleSubmit(values: { title: string; product: string; project: string; description: string }) {

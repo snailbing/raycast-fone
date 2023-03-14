@@ -1,4 +1,3 @@
-import sort from "../utils/sort";
 
 export interface Task {
   id: string;

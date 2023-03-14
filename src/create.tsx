@@ -1,4 +1,4 @@
-import { ActionPanel, Form, Icon, showToast, Toast, Action, popToRoot, Clipboard, getPreferenceValues } from "@raycast/api";
+import { ActionPanel, Form, Icon, showToast, Toast, Action, Clipboard, getPreferenceValues, closeMainWindow, PopToRootType } from "@raycast/api";
 import { createTask, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 
@@ -77,13 +77,14 @@ function CreateTaskAction() {
       const response = await createTask(params);
 
       if (response && response.success == true) {
-          await Clipboard.copy("https://fone.come-future.com/fone/projectDetail/task/" + projectId);
+        await Clipboard.copy("https://fone.come-future.com/fone/projectDetail/task/" + projectId);
         toast.style = Toast.Style.Success;
         toast.title = "Create Task";
         toast.message = "Copied link to clipboard";
         setTimeout(() => {
-          popToRoot({ clearSearchBar: true });
-        }, 3000);
+          // popToRoot({ clearSearchBar: true });
+          closeMainWindow({ clearRootSearch: true, popToRootType: PopToRootType.Immediate });
+        }, 2000);
       } else {
         toast.style = Toast.Style.Failure;
         toast.title = "Failed create Task";

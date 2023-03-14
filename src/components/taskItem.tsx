@@ -51,7 +51,7 @@ const TaskItem: React.FC<{
     return `https://fone.come-future.com/fone/projectDetail/task/${projectId}?workItemId=${id}`;
   }, [id, projectId]);
 
-  async function taskFinish(values: any) {
+  const taskFinish = async (values: any) => {
     const toast = await showToast({ style: Toast.Style.Animated, title: "Finish Fone Task" });
 
     try {
@@ -74,7 +74,7 @@ const TaskItem: React.FC<{
       toast.message = String(error);
     }
     return false;
-  }
+  };
 
   return (
     <List.Item
@@ -88,9 +88,10 @@ const TaskItem: React.FC<{
             title="完成"
             icon={Icon.Circle}
             onAction={() => {
-              onTaskFinish(false);
               const b = taskFinish(props);
-              onTaskFinish(b);
+              if (b) {
+                onTaskFinish(b, id);
+              }
             }}
           />
         </ActionPanel>

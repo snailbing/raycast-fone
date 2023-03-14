@@ -95,7 +95,7 @@ const client = got.extend({
   },
 });
 
-export const getFoneTasks = async (keyword: any) => {
+export const getFoneTasks = async (keyword?: string | null) => {
   var query: { state: string[]; title?: string } = { state: ["1", "4"] };
   if (keyword) {
     query.title = keyword;

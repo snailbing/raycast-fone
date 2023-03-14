@@ -84,7 +84,7 @@ function CreateTaskAction() {
         setTimeout(() => {
           // popToRoot({ clearSearchBar: true });
           closeMainWindow({ clearRootSearch: true, popToRootType: PopToRootType.Immediate });
-        }, 2000);
+        }, 1500);
       } else {
         toast.style = Toast.Style.Failure;
         toast.title = "Failed create Task";

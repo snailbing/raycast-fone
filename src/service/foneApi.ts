@@ -117,8 +117,6 @@ export const getFoneTasks = async (keyword?: string | null) => {
   return (response as any).data.records;
 };
 
-title: "倪剑";
-
 export const getToday = async () => {
   // return getFoneTasks(null);
   return getSearchByKeyword(null);

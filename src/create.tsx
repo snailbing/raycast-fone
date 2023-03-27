@@ -17,6 +17,7 @@ const { projectId } = getPreferenceValues<Preferences>();
 
 const projectDic = new Map<string, string>([
   ["21005", "浙一项目-金刚电子病历"],
+  ["17001", "浙一项目--未来医院"],
   ["32006", "富阳中医骨伤项目/大HIS"],
   ["17040", "余杭二院、三院、良渚医院数据及业务中台项目"],
   ["17014", "上海中山项目--老年医学中心项目"],
@@ -30,6 +31,7 @@ const productDic = new Map<string, string>([
   ["17011", "护理中心"],
   ["17021", "住院"],
   ["16001", "HBOS"],
+  ["16006", "浙一HIS"],
 ]);
 
 const gnNode = (myMap: Map<string, string>) => {

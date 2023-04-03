@@ -65,13 +65,14 @@ export default function Command() {
         {gnNode(productDic)}
       </Form.Dropdown>
 
+      <Form.TextField id="workHour" title="工时(H)" placeholder="输入明确的或预期工时..." />
       <Form.TextArea id="description" title="内容" placeholder="Enter task content ..." />
     </Form>
   );
 }
 
 function CreateTaskAction() {
-  async function handleSubmit(values: { title: string; product: string; project: string; description: string }) {
+  async function handleSubmit(values: { title: string; product: string; project: string; workHour:string; description: string }) {
     if (!values.title) {
       showToast({
         style: Toast.Style.Failure,
@@ -84,6 +85,7 @@ function CreateTaskAction() {
       title: values.title,
       project: { value: values.project, label: projectDic.get(values.project) },
       product: { value: values.product, label: productDic.get(values.product) },
+      workHour: values.workHour,
       description: values.description,
     };
 

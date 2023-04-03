@@ -184,7 +184,7 @@ export const createTask = async (params: any) => {
           principalId: userId,
           reporter: null,
           priority: null,
-          workHour: null,
+          workHour: params["workHour"],
           description: params["description"],
           workitemTypeId: { label: "通用任务", value: "10040008" },
           planStartTime: null,

@@ -127,7 +127,7 @@ export const getNext7Days = async () => {
   return getSearchByKeyword(null);
 };
 
-export const getSearchByKeyword = async (keyword: string) => {
+export const getSearchByKeyword = async (keyword: string | null) => {
   try {
     const result = await getFoneTasks(keyword);
     if (!result || result.length == 0) {

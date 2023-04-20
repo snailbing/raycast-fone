@@ -223,3 +223,19 @@ export const changTaskState = async (taskId: string, state: string) => {
     .json();
   return response as any;
 };
+
+
+export const addToThisWeek =async (itemId: string) => {
+  const response = await client
+    .post("https://fone.come-future.com/eip-fone/view/addItem", {
+      json: {
+        collectChildRequirement: false,
+        collectChildTask: false,
+        viewId: "0",
+        itemIds: [ itemId ]
+      },
+      responseType: "json",
+    })
+    .json();
+  return response as any;
+}

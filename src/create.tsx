@@ -10,7 +10,7 @@ import {
   closeMainWindow,
   PopToRootType,
 } from "@raycast/api";
-import { createTask, Preferences } from "./service/foneApi";
+import { addToThisWeek, createTask, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 
 const { projectId } = getPreferenceValues<Preferences>();
@@ -95,6 +95,8 @@ function CreateTaskAction() {
       const response = await createTask(params);
 
       if (response && response.success == true) {
+        let itemId = response.data.id;
+        await addToThisWeek(itemId);
         await Clipboard.copy("https://fone.come-future.com/fone/projectDetail/task/" + projectId);
         toast.style = Toast.Style.Success;
         toast.title = "Create Task";

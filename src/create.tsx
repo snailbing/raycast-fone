@@ -10,7 +10,7 @@ import {
   closeMainWindow,
   PopToRootType,
 } from "@raycast/api";
-import { addToThisWeek, createTask, Preferences } from "./service/foneApi";
+import { addToThisWeek, getThisWeekList, editThisWeekItem, createTask, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 
 const { projectId } = getPreferenceValues<Preferences>();
@@ -97,6 +97,9 @@ function CreateTaskAction() {
       if (response && response.success == true) {
         let itemId = response.data.id;
         await addToThisWeek(itemId);
+        const items = await getThisWeekList();
+        const relationId = items.get(itemId) as string
+        await editThisWeekItem(relationId, params.description, params.workHour);
         await Clipboard.copy("https://fone.come-future.com/fone/projectDetail/task/" + projectId);
         toast.style = Toast.Style.Success;
         toast.title = "Create Task";
@@ -104,7 +107,7 @@ function CreateTaskAction() {
         setTimeout(() => {
           // popToRoot({ clearSearchBar: true });
           closeMainWindow({ clearRootSearch: true, popToRootType: PopToRootType.Immediate });
-        }, 1500);
+        }, 1000);
       } else {
         toast.style = Toast.Style.Failure;
         toast.title = "Failed create Task";

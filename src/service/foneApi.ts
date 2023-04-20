@@ -225,7 +225,7 @@ export const changTaskState = async (taskId: string, state: string) => {
 };
 
 
-export const addToThisWeek =async (itemId: string) => {
+export const addToThisWeek = async (itemId: string) => {
   const response = await client
     .post("https://fone.come-future.com/eip-fone/view/addItem", {
       json: {
@@ -233,6 +233,39 @@ export const addToThisWeek =async (itemId: string) => {
         collectChildTask: false,
         viewId: "0",
         itemIds: [ itemId ]
+      },
+      responseType: "json",
+    })
+    .json();
+  return response as any;
+}
+
+
+export const getThisWeekList =async () => {
+  const response = await client
+    .post("https://fone.come-future.com/eip-fone/view/listItem", {
+      json: {
+        cycleId: "10001001",
+        viewId: "0"
+      },
+      responseType: "json",
+    })
+    .json();
+  let data = (response as any).data;
+  const items = new Map<string, string>()
+  data.map((item: any) => {
+    items.set(item.id, item.relationId);
+  });
+  return items;
+}
+
+export const editThisWeekItem = async (relationId: string, remark: string, workHour: string) => {
+  const response = await client
+    .post("https://fone.come-future.com/eip-fone/view/editItem", {
+      json: {
+        relationId: relationId,
+        remark: remark,
+        workHour: workHour
       },
       responseType: "json",
     })

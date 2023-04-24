@@ -10,7 +10,7 @@ import {
   closeMainWindow,
   PopToRootType,
 } from "@raycast/api";
-import { addToThisWeek, getThisWeekList, editThisWeekItem, createTask, Preferences } from "./service/foneApi";
+import { addToThisWeek, getThisWeekList, editThisWeekItem, getCurrentWeekId, createTask, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 
 const { projectId } = getPreferenceValues<Preferences>();
@@ -97,7 +97,28 @@ function CreateTaskAction() {
       if (response && response.success == true) {
         let itemId = response.data.id;
         await addToThisWeek(itemId);
-        const items = await getThisWeekList();
+        const currentWeekResponse = await getCurrentWeekId();
+        let currentWeekData = (currentWeekResponse as any).data;
+        let weekId = "";
+        const timeInterval = new Date().getTime();
+        currentWeekData.map((item: any) => {
+          /*
+          cycleCode:"2023:18"
+          cycleTitle:"2023年第18周0424-0430"
+          endTime:"2023-04-30 23:59:59"
+          id:"10002001"
+          sortIndex:null
+          startTime:"2023-04-24 00:00:00"
+          */
+          let tempStart = new Date(item.startTime).getTime();
+          let tempStop = new Date(item.endTime).getTime();
+          if(tempStart! < timeInterval && timeInterval < tempStop!){
+            weekId = item.id
+            return
+          }
+        });
+
+        const items = await getThisWeekList(weekId);
         const relationId = items.get(itemId) as string
         await editThisWeekItem(relationId, params.description, params.workHour);
         await Clipboard.copy("https://fone.come-future.com/fone/projectDetail/task/" + projectId);

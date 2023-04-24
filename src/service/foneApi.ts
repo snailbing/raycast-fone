@@ -240,12 +240,22 @@ export const addToThisWeek = async (itemId: string) => {
   return response as any;
 }
 
+export const getCurrentWeekId = async () => {
+  const response = await client
+    .post("https://fone.come-future.com/eip-fone/view/cycleList", {
+      json: {
+      },
+      responseType: "json",
+    })
+    .json();
+    return response as any;
+}
 
-export const getThisWeekList =async () => {
+export const getThisWeekList = async (cycldId: string) => {
   const response = await client
     .post("https://fone.come-future.com/eip-fone/view/listItem", {
       json: {
-        cycleId: "10001001",
+        cycleId: cycldId,
         viewId: "0"
       },
       responseType: "json",

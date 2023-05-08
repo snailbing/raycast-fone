@@ -95,7 +95,7 @@ const client = got.extend({
   },
 });
 
-export const getFoneTasks = async (keyword?: string | null) => {
+const getFoneTasks = async (keyword?: string | null) => {
   var query: { state: string[]; title?: string } = { state: ["1", "4"] };
   if (keyword) {
     query.title = keyword;
@@ -122,18 +122,22 @@ export const getToday = async () => {
   return getSearchByKeyword(null);
 };
 
-export const getNext7Days = async () => {
-  // return getFoneTasks(null);
-  return getSearchByKeyword(null);
-};
-
 export const getSearchByKeyword = async (keyword: string | null) => {
   try {
     const result = await getFoneTasks(keyword);
     if (!result || result.length == 0) {
       return [];
     }
-    const parsedResult = result;
+    var parsedResult = result;
+    var i = 0;
+    result.forEach((item: any) => {
+      i = i + 1
+      if (item.children && item.children.length > 0) {
+        // parsedResult.push(...item.children)
+        parsedResult.splice.apply(parsedResult, [i,0].concat(item.children))
+      }
+    });
+    
     return parsedResult.map(taskObject2Task);
   } catch (e) {
     errorHandler(e);

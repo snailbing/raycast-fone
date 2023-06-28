@@ -12,6 +12,8 @@ import {
 } from "@raycast/api";
 import { addToThisWeek, getThisWeekList, editThisWeekItem, getCurrentWeekId, createTask, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
+import { createCalendarEvent } from "./utils/jxa";
+import { CalendarEvent } from './utils/types';
 
 const { projectId } = getPreferenceValues<Preferences>();
 
@@ -94,13 +96,13 @@ function CreateTaskAction() {
     try {
       const response = await createTask(params);
 
+      const timeInterval = new Date().getTime();
       if (response && response.success == true) {
         let itemId = response.data.id;
         await addToThisWeek(itemId);
         const currentWeekResponse = await getCurrentWeekId();
         let currentWeekData = (currentWeekResponse as any).data;
         let weekId = "";
-        const timeInterval = new Date().getTime();
         currentWeekData.map((item: any) => {
           /*
           cycleCode:"2023:18"
@@ -121,7 +123,22 @@ function CreateTaskAction() {
         const items = await getThisWeekList(weekId);
         const relationId = items.get(itemId) as string
         await editThisWeekItem(relationId, params.description, params.workHour);
-        await Clipboard.copy("https://fone.come-future.com/fone/projectDetail/task/" + projectId);
+        const taskUrl = "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
+        await Clipboard.copy(taskUrl);
+
+        // 创建本地的日历
+        const event : CalendarEvent = {
+          id: itemId,
+          eventTitle: params.title,
+          desc: params.description,
+          startDate: new Date(timeInterval),
+          endDate: new Date(timeInterval + (Number(params.workHour)*60*60*1000)),
+          validated: true,
+          isAllDay: false,
+          url: taskUrl,
+        };
+        createCalendarEvent(event, "Fone")
+
         toast.style = Toast.Style.Success;
         toast.title = "Create Task";
         toast.message = "Copied link to clipboard";

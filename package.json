@@ -23,6 +23,13 @@
       "subtitle": "C2F Fone",
       "description": "Show Fone to-do tasks.",
       "mode": "view"
+    },
+    {
+      "name": "syncevent",
+      "title": "Sync Calendar Event",
+      "subtitle": "C2F Fone",
+      "description": "Sync Calendar Event To Fone Tasks.",
+      "mode": "no-view"
     }
   ],
   "preferences": [
@@ -61,9 +68,9 @@
   ],
   "dependencies": {
     "@raycast/api": "^1.48.8",
+    "@raycast/utils": "^1.8.0",
     "got": "^11.8.2",
     "moment": "^2.29.1",
-    "osascript-tag": "^0.1.2",
     "run-applescript": "^6.0.0"
   },
   "devDependencies": {

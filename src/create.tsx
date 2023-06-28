@@ -10,10 +10,10 @@ import {
   closeMainWindow,
   PopToRootType,
 } from "@raycast/api";
-import { addToThisWeek, getThisWeekList, editThisWeekItem, getCurrentWeekId, createTask, Preferences } from "./service/foneApi";
+import { createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 import { createCalendarEvent } from "./utils/jxa";
-import { CalendarEvent } from './utils/types';
+import { CalendarEvent } from "./utils/types";
 
 const { projectId } = getPreferenceValues<Preferences>();
 
@@ -74,7 +74,13 @@ export default function Command() {
 }
 
 function CreateTaskAction() {
-  async function handleSubmit(values: { title: string; product: string; project: string; workHour:string; description: string }) {
+  async function handleSubmit(values: {
+    title: string;
+    product: string;
+    project: string;
+    workHour: string;
+    description: string;
+  }) {
     if (!values.title) {
       showToast({
         style: Toast.Style.Failure,
@@ -94,50 +100,26 @@ function CreateTaskAction() {
     const toast = await showToast({ style: Toast.Style.Animated, title: "Create Fone Task" });
 
     try {
-      const response = await createTask(params);
+      const itemId = await createTaskAndEditWeekWork(params);
 
-      const timeInterval = new Date().getTime();
-      if (response && response.success == true) {
-        let itemId = response.data.id;
-        await addToThisWeek(itemId);
-        const currentWeekResponse = await getCurrentWeekId();
-        let currentWeekData = (currentWeekResponse as any).data;
-        let weekId = "";
-        currentWeekData.map((item: any) => {
-          /*
-          cycleCode:"2023:18"
-          cycleTitle:"2023年第18周0424-0430"
-          endTime:"2023-04-30 23:59:59"
-          id:"10002001"
-          sortIndex:null
-          startTime:"2023-04-24 00:00:00"
-          */
-          let tempStart = new Date(item.startTime).getTime();
-          let tempStop = new Date(item.endTime).getTime();
-          if(tempStart! < timeInterval && timeInterval < tempStop!){
-            weekId = item.id
-            return
-          }
-        });
-
-        const items = await getThisWeekList(weekId);
-        const relationId = items.get(itemId) as string
-        await editThisWeekItem(relationId, params.description, params.workHour);
+      if (itemId != null) {
         const taskUrl = "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
         await Clipboard.copy(taskUrl);
 
         // 创建本地的日历
-        const event : CalendarEvent = {
-          id: itemId,
+        const timeInterval = new Date().getTime();
+        const event: CalendarEvent = {
+          id: taskUrl,
           eventTitle: params.title,
           desc: params.description,
           startDate: new Date(timeInterval),
-          endDate: new Date(timeInterval + (Number(params.workHour)*60*60*1000)),
+          endDate: new Date(timeInterval + Number(params.workHour) * 60 * 60 * 1000),
           validated: true,
           isAllDay: false,
           url: taskUrl,
+          product: params.project.label + "/" + params.product.label,
         };
-        createCalendarEvent(event, "Fone")
+        createCalendarEvent(event, "Fone");
 
         toast.style = Toast.Style.Success;
         toast.title = "Create Task";
@@ -149,7 +131,6 @@ function CreateTaskAction() {
       } else {
         toast.style = Toast.Style.Failure;
         toast.title = "Failed create Task";
-        toast.message = response.message;
       }
     } catch (error) {
       toast.style = Toast.Style.Failure;

@@ -131,13 +131,13 @@ export const getSearchByKeyword = async (keyword: string | null) => {
     var parsedResult = result;
     var i = 0;
     result.forEach((item: any) => {
-      i = i + 1
+      i = i + 1;
       if (item.children && item.children.length > 0) {
         // parsedResult.push(...item.children)
-        parsedResult.splice.apply(parsedResult, [i,0].concat(item.children))
+        parsedResult.splice.apply(parsedResult, [i, 0].concat(item.children));
       }
     });
-    
+
     return parsedResult.map(taskObject2Task);
   } catch (e) {
     errorHandler(e);
@@ -228,7 +228,6 @@ export const changTaskState = async (taskId: string, state: string) => {
   return response as any;
 };
 
-
 export const addToThisWeek = async (itemId: string) => {
   const response = await client
     .post("https://fone.come-future.com/eip-fone/view/addItem", {
@@ -236,42 +235,41 @@ export const addToThisWeek = async (itemId: string) => {
         collectChildRequirement: false,
         collectChildTask: false,
         viewId: "0",
-        itemIds: [ itemId ]
+        itemIds: [itemId],
       },
       responseType: "json",
     })
     .json();
   return response as any;
-}
+};
 
 export const getCurrentWeekId = async () => {
   const response = await client
     .post("https://fone.come-future.com/eip-fone/view/cycleList", {
-      json: {
-      },
+      json: {},
       responseType: "json",
     })
     .json();
-    return response as any;
-}
+  return response as any;
+};
 
 export const getThisWeekList = async (cycldId: string) => {
   const response = await client
     .post("https://fone.come-future.com/eip-fone/view/listItem", {
       json: {
         cycleId: cycldId,
-        viewId: "0"
+        viewId: "0",
       },
       responseType: "json",
     })
     .json();
   let data = (response as any).data;
-  const items = new Map<string, string>()
+  const items = new Map<string, string>();
   data.map((item: any) => {
     items.set(item.id, item.relationId);
   });
   return items;
-}
+};
 
 export const editThisWeekItem = async (relationId: string, remark: string, workHour: string) => {
   const response = await client
@@ -279,10 +277,48 @@ export const editThisWeekItem = async (relationId: string, remark: string, workH
       json: {
         relationId: relationId,
         remark: remark,
-        workHour: workHour
+        workHour: workHour,
       },
       responseType: "json",
     })
     .json();
   return response as any;
-}
+};
+
+
+export const createTaskAndEditWeekWork = async (params: any) => {
+  const response = await createTask(params);
+
+  if (response && response.success == true) {
+    let itemId = response.data.id;
+    await addToThisWeek(itemId);
+    const currentWeekResponse = await getCurrentWeekId();
+    let currentWeekData = (currentWeekResponse as any).data;
+    let weekId = "";
+    const timeInterval = new Date().getTime();
+    currentWeekData.map((item: any) => {
+      /*
+          cycleCode:"2023:18"
+          cycleTitle:"2023年第18周0424-0430"
+          endTime:"2023-04-30 23:59:59"
+          id:"10002001"
+          sortIndex:null
+          startTime:"2023-04-24 00:00:00"
+          */
+      let tempStart = new Date(item.startTime).getTime();
+      let tempStop = new Date(item.endTime).getTime();
+      if (tempStart! < timeInterval && timeInterval < tempStop!) {
+        weekId = item.id;
+        return;
+      }
+    });
+
+    const items = await getThisWeekList(weekId);
+    const relationId = items.get(itemId) as string;
+    await editThisWeekItem(relationId, params.description, params.workHour);
+
+    return itemId;
+  }
+
+  return null;
+};

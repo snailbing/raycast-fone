@@ -29,7 +29,7 @@
       "title": "Sync Calendar Event",
       "subtitle": "C2F Fone",
       "description": "Sync Calendar Event To Fone Tasks.",
-      "mode": "no-view"
+      "mode": "view"
     }
   ],
   "preferences": [

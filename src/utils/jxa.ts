@@ -58,12 +58,13 @@ export const getCalendarEvents = async (calendarName: string, startDate: Date, e
           "endDate": event.endDate().getTime(),
           "description": event.description(),
           "product": event.location(),
+          "calendar": "${calendarName}",
         });
        }
     }
     es
   `,
-    { language: "JavaScript", humanReadableOutput: false }
+    { language: "JavaScript", humanReadableOutput: false, timeout: 30000}
   );
   // console.log(res);
   // await showHUD(res);

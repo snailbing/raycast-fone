@@ -31,8 +31,8 @@ export const createCalendarEvent = async (item: CalendarEvent, calendarName: str
       app.includeStandardAdditions = true
       var Calendar = Application("Calendar")
       var date = new Date(${item.startDate.getTime()})
-      Calendar.viewCalendar({at: date})
     `,
+    // Calendar.viewCalendar({at: date})
     { language: "JavaScript", humanReadableOutput: false });
 };
 

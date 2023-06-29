@@ -10,20 +10,19 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
 
   const { projectId } = getPreferenceValues<Preferences>();
 
+  const getEvents = async (day: any, calendar: string) => {
+    const sep = day * 24 * 60 * 60 * 1000;
+    const curDate = new Date();
+    const endDate = new Date(curDate.getTime() + sep);
+    const startDate = new Date(curDate.getTime() - sep);
+    const events = await getCalendarEvents(calendar, startDate, endDate);
+    return events;
+  };
+
   useEffect(() => {
     const getAllEvents = async () => {
-      const sep = 3 * 24 * 60 * 60 * 1000;
-      const curDate = new Date();
-      const endDate = new Date(curDate.getTime() + sep);
-      const startDate = new Date(curDate.getTime() - sep);
-      const dingStartDate = new Date(curDate.getTime() - sep / 3);
-      const dingEndDate = new Date(curDate.getTime());
-      const foneEvents = await getCalendarEvents("Fone", startDate, endDate);
-      console.log("ccccccc", foneEvents);
-      const dingEvents = await getCalendarEvents("我的日历（钉钉）", dingStartDate, dingEndDate);
-      console.log("aaaaaaa", dingEvents);
-      const events = [...JSON.parse(foneEvents), ...JSON.parse(dingEvents)];
-      setAllEvents(events);
+      const foneEvents = await getEvents(1, "Fone");
+      setAllEvents(JSON.parse(foneEvents));
     };
 
     if (isInitCompleted) {
@@ -33,8 +32,10 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
 
   const isLoading = useMemo(() => {
     if (!isInitCompleted) {
+      console.log("aaaaaaaaaaa", allEvents == null);
       return allEvents == null;
     }
+    console.log("bbbbbbbbb", allEvents == null);
     return allEvents == null;
   }, [isInitCompleted, allEvents]);
 
@@ -67,20 +68,6 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     return true;
   };
 
-  const syncAllEvents = (calendar: string) => {
-    let success = true;
-    allEvents!.forEach(async (element) => {
-      if (element.calendar == calendar) {
-        success = await event2Fone(element);
-      }
-    });
-    if (success) {
-      showToast(Toast.Style.Success, "Success", "Sync Calendar Event To Fone Tasks Success");
-    } else {
-      showToast(Toast.Style.Failure, "Failure", "失败了请检查日历与FONEß");
-    }
-  };
-
   const syncOneEvent = (id: string) => {
     let success = true;
     allEvents!.forEach(async (element) => {
@@ -98,36 +85,59 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
   return (
     <List
       isLoading={isLoading}
-      actions={
-        <ActionPanel>
-          <Action
-            title="同步 Fone Calendar"
-            icon={Icon.Circle}
-            onAction={() => {
-              syncAllEvents("Fone");
-            }}
-          />
-          <Action
-            title="同步 Ding Calendar"
-            icon={Icon.Circle}
-            onAction={() => {
-              syncAllEvents("我的日历（钉钉）");
-            }}
-          />
-        </ActionPanel>
-      }
+      filtering={false}
     >
       <List.Item
-        key={"sync fone calendar"}
-        title={"同步三天内的 Fone 日历到 Fone 网站中"}
+        key={"sync there day fone calendar"}
+        title={"列出前后三天内的 Fone 日历内容"}
         icon={{ source: Icon.CircleFilled, tintColor: Color.Red }}
         actions={
           <ActionPanel>
             <Action
               title="同步"
               icon={Icon.Circle}
-              onAction={() => {
-                syncAllEvents("Fone");
+              onAction={async () => {
+                setAllEvents(null);
+                const foneEvents = await getEvents(3, "Fone");
+                setAllEvents(JSON.parse(foneEvents));
+              }}
+            />
+          </ActionPanel>
+        }
+      />
+
+      <List.Item
+        key={"sync two day fone calendar"}
+        title={"列出前后二天内的 Fone 日历内容"}
+        icon={{ source: Icon.CircleFilled, tintColor: Color.Red }}
+        actions={
+          <ActionPanel>
+            <Action
+              title="同步"
+              icon={Icon.Circle}
+              onAction={async () => {
+                setAllEvents(null);
+                const foneEvents = await getEvents(2, "Fone");
+                setAllEvents(JSON.parse(foneEvents));
+              }}
+            />
+          </ActionPanel>
+        }
+      />
+
+      <List.Item
+        key={"sync one day fone calendar"}
+        title={"列出前后一天内的 Fone 日历内容"}
+        icon={{ source: Icon.CircleFilled, tintColor: Color.Red }}
+        actions={
+          <ActionPanel>
+            <Action
+              title="同步"
+              icon={Icon.Circle}
+              onAction={async () => {
+                setAllEvents(null);
+                const foneEvents = await getEvents(1, "Fone");
+                setAllEvents(JSON.parse(foneEvents));
               }}
             />
           </ActionPanel>
@@ -136,15 +146,17 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
 
       <List.Item
         key={"sync ding calendar"}
-        title={"同步一天内的钉钉日历到 Fone 网站中"}
+        title={"列出前后半天内的钉钉日历内容"}
         icon={{ source: Icon.CircleFilled, tintColor: Color.Red }}
         actions={
           <ActionPanel>
             <Action
               title="同步"
               icon={Icon.Circle}
-              onAction={() => {
-                syncAllEvents("我的日历（钉钉）");
+              onAction={async () => {
+                setAllEvents(null);
+                const foneEvents = await getEvents(0.5, "我的日历（钉钉）");
+                setAllEvents(JSON.parse(foneEvents));
               }}
             />
           </ActionPanel>
@@ -163,7 +175,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
                 title="同步这一条"
                 icon={Icon.Circle}
                 onAction={() => {
-                  syncOneEvent(event.id)
+                  syncOneEvent(event.id);
                   const all = allEvents?.filter((item) => item.id !== event.id);
                   setAllEvents(all);
                 }}

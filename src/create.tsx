@@ -12,8 +12,8 @@ import {
 } from "@raycast/api";
 import { createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
-import { createCalendarEvent } from "./utils/jxa";
-import { CalendarEvent } from "./utils/types";
+import { addTickTickTask } from "./utils/tickTick";
+import { addTickFoneTasks } from "./service/tickApi";
 
 const { projectId } = getPreferenceValues<Preferences>();
 
@@ -108,19 +108,38 @@ function CreateTaskAction() {
         await Clipboard.copy(taskUrl);
 
         // 创建本地的日历
-        const timeInterval = new Date().getTime();
-        const event: CalendarEvent = {
-          id: taskUrl,
-          eventTitle: params.title,
-          desc: params.description,
-          startDate: new Date(timeInterval),
-          endDate: new Date(timeInterval + Number(params.workHour) * 60 * 60 * 1000),
-          validated: true,
-          isAllDay: false,
-          url: taskUrl,
-          product: params.project.label + "/" + params.product.label,
-        };
-        createCalendarEvent(event, "Fone");
+        // const timeInterval = new Date().getTime();
+        // const event: CalendarEvent = {
+        //   id: taskUrl,
+        //   eventTitle: params.title,
+        //   desc: params.description,
+        //   startDate: new Date(timeInterval),
+        //   endDate: new Date(timeInterval + Number(params.workHour) * 60 * 60 * 1000),
+        //   validated: true,
+        //   isAllDay: false,
+        //   url: taskUrl,
+        //   product: params.project.label + "/" + params.product.label,
+        // };
+        // createCalendarEvent(event, "Fone");
+
+        // // 本地创建滴答清单 Fone
+        // addTickTickTask({
+        //   projectId: "64ae0db63ff3d179eaedba4d",
+        //   title: params.title,
+        //   description: params.description,
+        //   // dueDate?: new Date(timeInterval),
+        //   isAllDay: false,
+        // });
+
+        // 网络创建滴答清单 Fone
+        const res = await addTickFoneTasks({
+          projectId: "64ae0db63ff3d179eaedba4d",
+          title: params.title,
+          description: params.description,
+          foneUrl: taskUrl,
+          projectName: params.project.label as string,
+        })
+        console.log("添加滴答清单" + JSON.stringify(res))
 
         toast.style = Toast.Style.Success;
         toast.title = "Create Task";

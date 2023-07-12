@@ -14,6 +14,18 @@ export interface Task {
   children?: Task[];
 }
 
+export interface TickTickTask {
+  id: string;
+  title: string;
+  priority: 0 | 1 | 3 | 5 | undefined;
+  projectId: string;
+  content?: string;
+  desc?: string;
+  items?: ChecklistItem[];
+  kind?: TaskKind;
+  tags: string[];
+}
+
 export interface TaskState {
   label: string;
   value: number;
@@ -24,14 +36,14 @@ export interface BizPorject {
   value: string;
 }
 
-// export interface ChecklistItem {
-//   status: number;
-//   isAllDay: boolean;
-//   startDate: string;
-//   title: string;
-//   id: string;
-//   sortOrder: number;
-// }
+export interface ChecklistItem {
+  status: number;
+  isAllDay: boolean;
+  startDate: string;
+  title: string;
+  id: string;
+  sortOrder: number;
+}
 
 export interface Section {
   id: string;
@@ -39,11 +51,11 @@ export interface Section {
   children: Task[];
 }
 
-// export enum TaskKind {
-//   Text = "TEXT",
-//   Checklist = "CHECKLIST",
-//   Note = "NOTE",
-// }
+export enum TaskKind {
+  Text = "TEXT",
+  Checklist = "CHECKLIST",
+  Note = "NOTE",
+}
 
 export const hasItems = (task: Task) => {
   const items = task.children;

@@ -1,8 +1,9 @@
 import { showToast, Toast, getPreferenceValues, List, Action, ActionPanel, Color, Icon } from "@raycast/api";
 import React, { useEffect, useMemo, useState } from "react";
-import { getCalendarEvents, updateEventUrlById } from "./utils/jxa";
+import { getCalendarEvents, updateEventUrlById } from "./utils/calendar";
 import { createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import useStartApp from "./hooks/useStartApp";
+import { getTickFoneTasks, getTickTasks } from "./service/tickApi";
 
 const SyncEvent: React.FC<Record<string, never>> = () => {
   const [allEvents, setAllEvents] = useState<any[] | null>(null);
@@ -87,7 +88,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       isLoading={isLoading}
       filtering={false}
     >
-      <List.Item
+      {/* <List.Item
         key={"sync there day fone calendar"}
         title={"列出前后三天内的 Fone 日历内容"}
         icon={{ source: Icon.CircleFilled, tintColor: Color.Red }}
@@ -157,6 +158,26 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
                 setAllEvents(null);
                 const foneEvents = await getEvents(0.5, "我的日历（钉钉）");
                 setAllEvents(JSON.parse(foneEvents));
+              }}
+            />
+          </ActionPanel>
+        }
+      /> */}
+
+<List.Item
+        key={"sync tick calendar"}
+        title={"列出滴答清单的内容"}
+        icon={{ source: Icon.CircleFilled, tintColor: Color.Red }}
+        actions={
+          <ActionPanel>
+            <Action
+              title="同步"
+              icon={Icon.Circle}
+              onAction={async () => {
+                setAllEvents(null);
+                const tickEvents = await getTickFoneTasks();
+                console.log(tickEvents)
+                // setAllEvents(JSON.parse(tickEvents));
               }}
             />
           </ActionPanel>

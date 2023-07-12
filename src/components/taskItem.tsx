@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { changTaskState } from "../service/foneApi";
 import { Task } from "../service/task";
 import { addSpaceBetweenEmojiAndText } from "../utils/text";
+import { completedTickFoneTask } from "../service/tickApi";
 
 const TaskItem: React.FC<{
   id: Task["id"];
@@ -59,6 +60,8 @@ const TaskItem: React.FC<{
 
       if (response && response.success == true) {
         //   await Clipboard.copy((body as any).authenticated_url);
+        const res = await completedTickFoneTask(target);
+        console.log("完成" + target + JSON.stringify(res));
         toast.style = Toast.Style.Success;
         toast.title = "Finish Task";
         // toast.message = "Copied link to clipboard";

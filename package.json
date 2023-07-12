@@ -26,7 +26,7 @@
     },
     {
       "name": "syncevent",
-      "title": "Sync Calendar Event",
+      "title": "Sync Tick Event",
       "subtitle": "C2F Fone",
       "description": "Sync Calendar Event To Fone Tasks.",
       "mode": "view"

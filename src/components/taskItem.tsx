@@ -60,7 +60,7 @@ const TaskItem: React.FC<{
 
       if (response && response.success == true) {
         //   await Clipboard.copy((body as any).authenticated_url);
-        const res = await completedTickFoneTask(target);
+        const res = await completedTickFoneTask(target, values.id);
         console.log("完成" + target + JSON.stringify(res));
         toast.style = Toast.Style.Success;
         toast.title = "Finish Task";

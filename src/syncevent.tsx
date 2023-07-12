@@ -4,6 +4,7 @@ import { getCalendarEvents, updateEventUrlById } from "./utils/calendar";
 import { createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import useStartApp from "./hooks/useStartApp";
 import { findTickFoneCompletedUnSyncTask, findTickFoneUnSyncTask, updateTickFoneOneTask } from "./service/tickApi";
+import { productDic, projectDic } from "./create";
 
 const SyncEvent: React.FC<Record<string, never>> = () => {
   const [allEvents, setAllEvents] = useState<any[] | null>(null);
@@ -74,9 +75,21 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
   const tick2Fone = async (element: any) => {
     // "17018", "来未来&熙牛"
     // "16001", "HBOS"
+
+    let projectInfo = { value: "17018", label: "来未来&熙牛" };
+    if (element.tags) {
+      projectDic.forEach((value, key) => {
+        if (value == element.tags[0]) {
+          projectInfo.value = key;
+          projectInfo.label = value;
+          return;
+        }
+      });
+    }
+
     const params = {
       title: element.title,
-      project: { value: "17018", label: "来未来&熙牛" },
+      project: projectInfo,
       product: { value: "16001", label: "HBOS" },
       workHour: "1",
       description: element.content,
@@ -90,17 +103,19 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     const taskUrl = "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
     console.log(taskUrl);
     element.desc = taskUrl;
-    await updateTickFoneOneTask(element)
+    element.content = element.content + "\n" + taskUrl;
+    await updateTickFoneOneTask(element);
     return true;
   };
 
-  const syncOneEvent2Fone = (id: string) => {
-    let success = true;
-    allEvents!.forEach(async (element) => {
-      if (element.id == id) {
-        success = await tick2Fone(element);
-      }
-    });
+  const syncOneEvent2Fone = async (task: any) => {
+    // task.assignee &&
+    if (task.status == 2) {
+      showToast(Toast.Style.Failure, "Failure", "已经完成的暂不支持再同步");
+      return;
+    }
+    const success = await tick2Fone(task);
+
     if (success) {
       showToast(Toast.Style.Success, "Success", "Sync Calendar Event To Fone Tasks Success");
     } else {
@@ -199,7 +214,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
                 setAllEvents(null);
                 const tickEvents = await findTickFoneUnSyncTask();
                 console.log(tickEvents);
-                setAllEvents(JSON.parse(tickEvents));
+                setAllEvents(tickEvents);
               }}
             />
           </ActionPanel>
@@ -238,7 +253,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
                 title="同步"
                 icon={Icon.Circle}
                 onAction={() => {
-                  syncOneEvent2Fone(event.id);
+                  syncOneEvent2Fone(event);
                   const all = allEvents?.filter((item) => item.id !== event.id);
                   setAllEvents(all);
                 }}

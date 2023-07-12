@@ -43,7 +43,7 @@ export const getTickCompletedTasks = async () => {
       responseType: "json",
     })
     .json();
-  return (response as any);
+  return response as any;
 };
 
 //   {
@@ -77,7 +77,7 @@ export const getTickCompletedTasks = async () => {
 export const getTickFoneTasks = async () => {
   let tasks = await getTickTasks();
   tasks = tasks.filter((task: any) => {
-    return task.projectId === "64ae0db63ff3d179eaedba4d";
+    return task.projectId == "64ae0db63ff3d179eaedba4d";
   });
   return tasks;
 };
@@ -85,41 +85,38 @@ export const getTickFoneTasks = async () => {
 export const findTickFoneOneTaskByUrl = async (foneUrl: string) => {
   let tasks = await getTickFoneTasks();
   for (const task of tasks) {
-    if (task.desc === foneUrl || task.content.contains(foneUrl)) {
+    if (task.desc == foneUrl || task.content.includes(foneUrl)) {
       return task;
     }
   }
   return null;
 };
 
-
 export const findTickFoneUnSyncTask = async () => {
   let tasks = await getTickFoneTasks();
   tasks = tasks.filter((task: any) => {
-    return !task.desc || task.desc === "";
+    return (!task.desc || task.desc == "") && !task.content.includes("https://fone.come-future.com");
   });
   return tasks;
 };
-
 
 export const findTickFoneCompletedUnSyncTask = async () => {
   let tasks = await getTickCompletedTasks();
   tasks = tasks.filter((task: any) => {
-    return !task.assignee || task.assignee === "";
+    return !task.assignee || task.assignee == "";
   });
   return tasks;
 };
 
-
-export const completedTickFoneTask = async (foneUrl: string) => {
+export const completedTickFoneTask = async (foneUrl: string, id: number) => {
   let task = await findTickFoneOneTaskByUrl(foneUrl);
   if (task == null) {
     return null;
   }
-  console.log("Fone Taks" + JSON.stringify(task))
-  task.assignee = 1;
+  console.log("Fone Taks" + JSON.stringify(task));
+  task.assignee = id ? id : 1;
   task.status = 2;
-  return updateTickFoneOneTask(task)
+  return updateTickFoneOneTask(task);
 };
 
 export const updateTickFoneOneTask = async (task: any) => {
@@ -139,14 +136,13 @@ export const updateTickFoneOneTask = async (task: any) => {
   return response as any;
 };
 
-
 const taskToTickTask = (data: {
   projectId: string;
   title: string;
   description: string;
   foneUrl: string;
   projectName: string;
-})=> {
+}) => {
   const date = new Date();
   return {
     assignee: null,
@@ -157,10 +153,10 @@ const taskToTickTask = (data: {
     dueDate: null,
     exDate: [],
     id: null,
-    isAllDay: true,
+    isAllDay: false,
     isFloating: false,
     items: [],
-    kind: null,
+    kind: "TEXT",
     modifiedTime: formatToServerDate(date),
     priority: 0,
     progress: 0,
@@ -172,8 +168,8 @@ const taskToTickTask = (data: {
     tags: [data.projectName],
     timeZone: "Asia/Shanghai",
     title: data.title,
-  }
-}
+  };
+};
 
 //{"add":[{"items":[],"reminders":[{"id":"64ae8a06104e4d32008f9461","trigger":"TRIGGER:P0DT9H0M0S"}],"exDate":[],"dueDate":null,"priority":0,"isAllDay":true,"progress":0,"assignee":null,"sortOrder":-1099516870657,"startDate":"2023-07-11T16:00:00.000+0000","isFloating":false,"columnId":"64ae1858c359d1099bace222","status":0,"projectId":"64ae0db63ff3d179eaedba4d","kind":null,"createdTime":"2023-07-12T11:09:58.000+0000","modifiedTime":"2023-07-12T11:09:58.000+0000","title":"测试获取tick的创建API与参数","tags":["余二"],"timeZone":"Asia/Shanghai","content":"","id":"64ae8a06104e4d32008f9462"}],"update":[],"delete":[],"addAttachments":[],"updateAttachments":[],"deleteAttachments":[]}
 export const addTickFoneTasks = async (data: {
@@ -186,9 +182,7 @@ export const addTickFoneTasks = async (data: {
   const response = await client
     .post("https://api.dida365.com/api/v2/batch/task", {
       json: {
-        add: [
-          taskToTickTask(data),
-        ],
+        add: [taskToTickTask(data)],
         addAttachments: [],
         delete: [],
         deleteAttachments: [],

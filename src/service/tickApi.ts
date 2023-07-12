@@ -37,6 +37,15 @@ export const getTickTasks = async () => {
   return (response as any).syncTaskBean.update;
 };
 
+export const getTickCompletedTasks = async () => {
+  const response = await client
+    .get("https://api.dida365.com/api/v2/project/64ae0db63ff3d179eaedba4d/completed?from=&to=&limit=50", {
+      responseType: "json",
+    })
+    .json();
+  return (response as any);
+};
+
 //   {
 //     id: '64ae1c26e3d411099bace36f',
 //     projectId: '64ae0db63ff3d179eaedba4d',
@@ -73,18 +82,37 @@ export const getTickFoneTasks = async () => {
   return tasks;
 };
 
-export const findTickFoneOneTask = async (foneUrl: string) => {
+export const findTickFoneOneTaskByUrl = async (foneUrl: string) => {
   let tasks = await getTickFoneTasks();
   for (const task of tasks) {
-    if (task.desc === foneUrl) {
+    if (task.desc === foneUrl || task.content.contains(foneUrl)) {
       return task;
     }
   }
   return null;
 };
 
+
+export const findTickFoneUnSyncTask = async () => {
+  let tasks = await getTickFoneTasks();
+  tasks = tasks.filter((task: any) => {
+    return !task.desc || task.desc === "";
+  });
+  return tasks;
+};
+
+
+export const findTickFoneCompletedUnSyncTask = async () => {
+  let tasks = await getTickCompletedTasks();
+  tasks = tasks.filter((task: any) => {
+    return !task.assignee || task.assignee === "";
+  });
+  return tasks;
+};
+
+
 export const completedTickFoneTask = async (foneUrl: string) => {
-  let task = await findTickFoneOneTask(foneUrl);
+  let task = await findTickFoneOneTaskByUrl(foneUrl);
   if (task == null) {
     return null;
   }
@@ -111,56 +139,6 @@ export const updateTickFoneOneTask = async (task: any) => {
   return response as any;
 };
 
-// {"add":[],"update":[{"items":[],"reminders":[],"exDate":[],"dueDate":null,"priority":0,"isAllDay":false,"creator":1012056940,"focusSummaries":[],"progress":0,"assignee":null,"sortOrder":-4194305,"commentCount":0,"startDate":null,"isFloating":false,"attachments":[],"desc":"","columnId":"64ae1858c359d1099bace222","reminder":"","remindTime":null,"status":0,"projectId":"64ae0db63ff3d179eaedba4d","kind":"TEXT","etag":"s391xzwk","createdTime":"2023-07-12T09:22:46.000+0000","modifiedTime":"2023-07-12T10:17:06.000+0000","title":"跟进余二反馈的麻方问题","tags":["余二"],"timeZone":"Asia/Shanghai","content":"once、用量、医生\n还有过两天要检查了\n","id":"64ae70e6edb3d1099bace469"}],"delete":[],"addAttachments":[],"updateAttachments":[],"deleteAttachments":[]}
-export const updateTickFoneTasks = async () => {
-  const response = await client
-    .post("https://api.dida365.com/api/v2/batch/task", {
-      json: {
-        add: [],
-        addAttachments: [],
-        delete: [],
-        deleteAttachments: [],
-        update: [
-          {
-            assignee: null,
-            attachments: [],
-            columnId: "64ae1858c359d1099bace222",
-            commentCount: 0,
-            content: "once、用量、医生\n还有过两天要检查了\n",
-            createdTime: "2023-07-12T09:22:46.000+0000",
-            creator: 1012056940,
-            desc: "",
-            dueDate: null,
-            etag: "s391xzwk",
-            exDate: [],
-            focusSummaries: [],
-            id: "64ae70e6edb3d1099bace469",
-            isAllDay: false,
-            isFloating: false,
-            items: [],
-            kind: "TEXT",
-            modifiedTime: "2023-07-12T10:17:06.000+0000",
-            priority: 0,
-            progress: 0,
-            projectId: "64ae0db63ff3d179eaedba4d",
-            remindTime: null,
-            reminder: "",
-            reminders: [],
-            sortOrder: -4194305,
-            startDate: null,
-            status: 0,
-            tags: ["余二"],
-            timeZone: "Asia/Shanghai",
-            title: "跟进余二反馈的麻方问题",
-          },
-        ],
-        updateAttachments: [],
-      },
-      responseType: "json",
-    })
-    .json();
-  return response as any;
-};
 
 const taskToTickTask = (data: {
   projectId: string;
@@ -173,7 +151,7 @@ const taskToTickTask = (data: {
   return {
     assignee: null,
     columnId: null,
-    content: data.description,
+    content: data.description + "\n" + data.foneUrl,
     desc: data.foneUrl,
     createdTime: formatToServerDate(date),
     dueDate: null,

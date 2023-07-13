@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Color, Icon, List, showToast, Toast } from "@raycast/api";
 import { useMemo } from "react";
-import { changTaskState } from "../service/foneApi";
+import { changTaskStateToComplated } from "../service/foneApi";
 import { Task } from "../service/task";
 import { addSpaceBetweenEmojiAndText } from "../utils/text";
 import { completedTickFoneTask } from "../service/tickApi";
@@ -56,7 +56,7 @@ const TaskItem: React.FC<{
     const toast = await showToast({ style: Toast.Style.Animated, title: "Finish Fone Task" });
 
     try {
-      const response = await changTaskState(values.id, "36");
+      const response = await changTaskStateToComplated(values.id);
 
       if (response && response.success == true) {
         //   await Clipboard.copy((body as any).authenticated_url);

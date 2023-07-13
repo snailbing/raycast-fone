@@ -1,5 +1,6 @@
 import got from "got";
 import { formatToServerDate } from "../utils/date";
+import exp from "constants";
 
 const cookie =
   "t=43A001113F9610FF929A7FD2B9E37F35062D86B403CEFB15B4530564EDA7A2EAF98FE8DEC1D504C5A136FBA6D201C5CDF194970EBDBE64D7CDE80B40E7C0E502E40E18CB96B7BA33555C8DFAEAC655664256F6B515CF4CE07E8CD4122BA82EE17E5881C8DE09837D18F74D85BCEA6D59151002FFD8A511410766933FA30BF206BED1AF8B780AA0DBB3FD0CC4AE5A14E6A772473DE8707950E4A50BD170D67100619F77295F1B5393C31190CEFC02B558; AWSALB=XAPL9/7zI/ya+YBpbMMAh41SMcXXPAO/84boVoMeSR9PS7snOSZu1wg0Z2Go4iJpB9gAJRoazfcnL2cBJ2Jx48IPAVzD6n+c76FBTwscUhRcbRiqXcQhdhv6WQjl; AWSALBCORS=XAPL9/7zI/ya+YBpbMMAh41SMcXXPAO/84boVoMeSR9PS7snOSZu1wg0Z2Go4iJpB9gAJRoazfcnL2cBJ2Jx48IPAVzD6n+c76FBTwscUhRcbRiqXcQhdhv6WQjl";
@@ -95,7 +96,7 @@ export const findTickFoneOneTaskByUrl = async (foneUrl: string) => {
 export const findTickFoneUnSyncTask = async () => {
   let tasks = await getTickFoneTasks();
   tasks = tasks.filter((task: any) => {
-    return (!task.desc || task.desc == "") && !task.content.includes("https://fone.come-future.com");
+    return !taskFoneIsCreated(task);
   });
   return tasks;
 };
@@ -114,9 +115,59 @@ export const completedTickFoneTask = async (foneUrl: string, id: number) => {
     return null;
   }
   console.log("Fone Taks" + JSON.stringify(task));
+  return completedTickTask(task, id);
+};
+
+export const completedTickTask = async (task: any, id: number) => {
   task.assignee = id ? id : 1;
   task.status = 2;
   return updateTickFoneOneTask(task);
+};
+
+export const taskIsCompleted = (task: any) => {
+  if (task == null) {
+    return false;
+  }
+  return task.status == 2;
+};
+
+export const taskFoneIsCreated = (task: any) => {
+  if (task == null) {
+    return false;
+  }
+  return task.desc || task.content.includes("https://fone.come-future.com");
+};
+
+export const taskFoneIsCompleted = (task: any) => {
+  if (task == null) {
+    return false;
+  }
+  return task.status == 2 && task.assignee;
+};
+
+export const addFoneUrl2TickTask = async (task: any, foneUrl: string) => {
+  task.desc = foneUrl;
+  task.content = task.content + "\n" + foneUrl;
+  await updateTickFoneOneTask(task);
+};
+
+// "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
+export const getFoneItemIdByTickTask = (task: any) => {
+  if (!task) {
+    return null;
+  }
+  let content = task.desc;
+  if (!content) {
+    content = task.content;
+  }
+  if (!content) {
+    return null;
+  }
+  const spe = content.split("?workItemId=");
+  if (spe.length >= 2) {
+    return spe[1];
+  }
+  return null;
 };
 
 export const updateTickFoneOneTask = async (task: any) => {

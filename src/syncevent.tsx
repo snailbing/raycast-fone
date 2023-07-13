@@ -1,10 +1,19 @@
 import { showToast, Toast, getPreferenceValues, List, Action, ActionPanel, Color, Icon } from "@raycast/api";
 import React, { useEffect, useMemo, useState } from "react";
-import { getCalendarEvents, updateEventUrlById } from "./utils/calendar";
-import { createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
+import { updateEventUrlById } from "./utils/calendar";
+import { changTaskStateToComplated, createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import useStartApp from "./hooks/useStartApp";
-import { findTickFoneCompletedUnSyncTask, findTickFoneUnSyncTask, updateTickFoneOneTask } from "./service/tickApi";
-import { productDic, projectDic } from "./create";
+import {
+  addFoneUrl2TickTask,
+  completedTickTask,
+  findTickFoneCompletedUnSyncTask,
+  findTickFoneUnSyncTask,
+  getFoneItemIdByTickTask,
+  taskFoneIsCompleted,
+  taskFoneIsCreated,
+  taskIsCompleted,
+} from "./service/tickApi";
+import { projectDic } from "./create";
 
 const SyncEvent: React.FC<Record<string, never>> = () => {
   const [allEvents, setAllEvents] = useState<any[] | null>(null);
@@ -79,7 +88,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     let projectInfo = { value: "17018", label: "来未来&熙牛" };
     if (element.tags) {
       projectDic.forEach((value, key) => {
-        if (value.toUpperCase() == element.tags[0].toUpperCase()) {
+        if (value.toUpperCase().includes(element.tags[0].toUpperCase())) {
           projectInfo.value = key;
           projectInfo.label = value;
           return;
@@ -102,16 +111,30 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     }
     const taskUrl = "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
     console.log(taskUrl);
-    element.desc = taskUrl;
-    element.content = element.content + "\n" + taskUrl;
-    await updateTickFoneOneTask(element);
+    await addFoneUrl2TickTask(element, taskUrl);
     return true;
   };
 
   const syncOneEvent2Fone = async (task: any) => {
-    // task.assignee &&
-    if (task.status == 2) {
-      showToast(Toast.Style.Failure, "Failure", "已经完成的暂不支持再同步");
+    if (taskIsCompleted(task)) {
+      if (!taskFoneIsCompleted(task)) {
+        // 还有可能在FONE上都没有创建的
+        if (!taskFoneIsCreated(task)) {
+          console.log("滴答清单已经完成,但FONE上还没有的");
+          await tick2Fone(task);
+        }
+        // 获得ID
+        const itemId = getFoneItemIdByTickTask(task);
+        if (!itemId) {
+          console.log("没有获取到ItemId");
+          return;
+        }
+        console.log("获得itemId " + itemId);
+        await changTaskStateToComplated(itemId);
+        await completedTickTask(task, itemId);
+      } else {
+        showToast(Toast.Style.Failure, "Failure", "已经完成的暂不支持再同步");
+      }
       return;
     }
     const success = await tick2Fone(task);

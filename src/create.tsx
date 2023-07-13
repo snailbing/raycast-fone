@@ -104,7 +104,7 @@ function CreateTaskAction() {
     const toast = await showToast({ style: Toast.Style.Animated, title: "Create Fone Task" });
 
     try {
-      console.log("开始创建Fone" + params)
+      console.log("开始创建Fone" + JSON.stringify(params))
       const itemId = await createTaskAndEditWeekWork(params);
 
       if (itemId != null) {

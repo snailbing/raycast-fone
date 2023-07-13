@@ -4,6 +4,7 @@ import { Task } from "./task";
 import { runAppleScript } from "run-applescript";
 import { convertMacTime2JSTime, getSectionNameByDate } from "../utils/date";
 import got from "got";
+import exp from "constants";
 
 const taskObject2Task = (object: Record<string, any>): Task => {
   return {
@@ -205,6 +206,10 @@ export const createTask = async (params: any) => {
   return response as any;
 };
 
+export const changTaskStateToComplated = async (taskId: string) => {
+  return changTaskState(taskId, "36");
+};
+
 /**
  * 修改任务状态
  * @param projectId
@@ -284,7 +289,6 @@ export const editThisWeekItem = async (relationId: string, remark: string, workH
     .json();
   return response as any;
 };
-
 
 export const createTaskAndEditWeekWork = async (params: any) => {
   const response = await createTask(params);

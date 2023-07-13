@@ -79,7 +79,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     let projectInfo = { value: "17018", label: "来未来&熙牛" };
     if (element.tags) {
       projectDic.forEach((value, key) => {
-        if (value == element.tags[0]) {
+        if (value.toUpperCase() == element.tags[0].toUpperCase()) {
           projectInfo.value = key;
           projectInfo.label = value;
           return;

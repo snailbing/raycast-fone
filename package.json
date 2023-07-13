@@ -61,9 +61,25 @@
       "name": "cookie",
       "type": "textfield",
       "required": true,
-      "title": "Cookie",
+      "title": "Fone Cookie",
       "description": "The cookie value seen in the web request.",
       "placeholder": "cookie"
+    },
+    {
+      "name": "tickProjectId",
+      "type": "textfield",
+      "required": true,
+      "title": "TickTick Project ID",
+      "description": "The tick tick project_id value seen in the web request.",
+      "placeholder": "tick_project_id"
+    },
+    {
+      "name": "tickCookie",
+      "type": "textfield",
+      "required": true,
+      "title": "TickTick Cookie",
+      "description": "The cookie value seen in the web request.",
+      "placeholder": "tickCookie"
     }
   ],
   "dependencies": {

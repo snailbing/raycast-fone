@@ -12,7 +12,6 @@ import {
 } from "@raycast/api";
 import { createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
-import { addTickTickTask } from "./utils/tickTick";
 import { addTickFoneTasks } from "./service/tickApi";
 
 const { projectId } = getPreferenceValues<Preferences>();
@@ -128,7 +127,7 @@ function CreateTaskAction() {
 
         // // 本地创建滴答清单 Fone
         // addTickTickTask({
-        //   projectId: "64ae0db63ff3d179eaedba4d",
+        //   projectId: tickProjectId,
         //   title: params.title,
         //   description: params.description,
         //   // dueDate?: new Date(timeInterval),
@@ -137,7 +136,6 @@ function CreateTaskAction() {
 
         // 网络创建滴答清单 Fone
         const res = await addTickFoneTasks({
-          projectId: "64ae0db63ff3d179eaedba4d",
           title: params.title,
           description: params.description,
           foneUrl: taskUrl,

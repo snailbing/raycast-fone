@@ -14,8 +14,12 @@ type ExtensionPreferences = {
   "userId": string,
   /** User Name - The user_name value seen in the web request. */
   "userName": string,
-  /** Cookie - The cookie value seen in the web request. */
-  "cookie": string
+  /** Fone Cookie - The cookie value seen in the web request. */
+  "cookie": string,
+  /** TickTick Project ID - The tick tick project_id value seen in the web request. */
+  "tickProjectId": string,
+  /** TickTick Cookie - The cookie value seen in the web request. */
+  "tickCookie": string
 }
 
 /** Preferences accessible in all the extension's commands */

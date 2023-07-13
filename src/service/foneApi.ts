@@ -4,7 +4,6 @@ import { Task } from "./task";
 import { runAppleScript } from "run-applescript";
 import { convertMacTime2JSTime, getSectionNameByDate } from "../utils/date";
 import got from "got";
-import exp from "constants";
 
 const taskObject2Task = (object: Record<string, any>): Task => {
   return {
@@ -68,6 +67,8 @@ export type Preferences = {
   userId: string;
   userName: string;
   cookie: string;
+  tickCookie: string;
+  tickProjectId: string;
 };
 
 // projectId = 173746

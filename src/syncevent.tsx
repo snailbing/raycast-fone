@@ -100,7 +100,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       title: element.title,
       project: projectInfo,
       product: { value: "16001", label: "HBOS" },
-      workHour: "1",
+      workHour: "2",
       description: element.content,
     };
     const itemId = await createTaskAndEditWeekWork(params);

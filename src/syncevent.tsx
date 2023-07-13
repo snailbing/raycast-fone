@@ -110,7 +110,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       return false;
     }
     const taskUrl = "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
-    console.log(taskUrl);
+    console.log("添加urltotick" + taskUrl);
     await addFoneUrl2TickTask(element, taskUrl);
     return true;
   };

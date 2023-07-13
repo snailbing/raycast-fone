@@ -88,7 +88,7 @@ export const getTickFoneTasks = async () => {
 export const findTickFoneOneTaskByUrl = async (foneUrl: string) => {
   let tasks = await getTickFoneTasks();
   for (const task of tasks) {
-    if (task.desc == foneUrl || task.content.includes(foneUrl)) {
+    if (isTheTaskByFoneUrl(task, foneUrl)) {
       return task;
     }
   }
@@ -114,7 +114,19 @@ export const findTickFoneCompletedUnSyncTask = async () => {
 export const completedTickFoneTask = async (foneUrl: string, id: number) => {
   let task = await findTickFoneOneTaskByUrl(foneUrl);
   if (task == null) {
-    return null;
+    // 有可能是在完成列表里了
+    console.log("没有找到对应的滴答" + foneUrl);
+    const tasks = await findTickFoneCompletedUnSyncTask();
+    for (const aTask of tasks) {
+      if (isTheTaskByFoneUrl(aTask, foneUrl)) {
+        task = aTask;
+        break;
+      }
+    }
+    if (task == null) {
+      console.log("还是没有找到对应的滴答" + foneUrl);
+      return null;
+    }
   }
   console.log("Fone Taks" + JSON.stringify(task));
   return completedTickTask(task, id);
@@ -124,6 +136,15 @@ export const completedTickTask = async (task: any, id: number) => {
   task.assignee = id ? id : 1;
   task.status = 2;
   return updateTickFoneOneTask(task);
+};
+
+const isTheTaskByFoneUrl = (task: any, foneUrl: string) => {
+  if (!task) {
+    return false;
+  }
+  if (task.desc == foneUrl || task.content.includes(foneUrl)) {
+    return true;
+  }
 };
 
 export const taskIsCompleted = (task: any) => {
@@ -167,7 +188,11 @@ export const getFoneItemIdByTickTask = (task: any) => {
   }
   const spe = content.split("?workItemId=");
   if (spe.length >= 2) {
-    return spe[1];
+    content = spe[1];
+    if (content.includes("\n")) {
+      content = content.split("\n")[0];
+    }
+    return content;
   }
   return null;
 };

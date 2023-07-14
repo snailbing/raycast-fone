@@ -14,7 +14,7 @@ import { createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import { setTimeout } from "timers";
 import { addTickFoneTasks } from "./service/tickApi";
 
-const { projectId } = getPreferenceValues<Preferences>();
+const { projectId, workHour } = getPreferenceValues<Preferences>();
 
 export const projectDic = new Map<string, string>([
   // ["21005", "浙一项目-金刚电子病历"],
@@ -70,7 +70,7 @@ export default function Command() {
         {gnNode(productDic)}
       </Form.Dropdown>
 
-      <Form.TextField id="workHour" title="工时(H)" placeholder="输入明确的或预期工时..." />
+      <Form.TextField id="workHour" title="工时(H)" placeholder="输入明确的或预期工时..." defaultValue={workHour} />
       <Form.TextArea id="description" title="内容" placeholder="Enter task content ..." />
     </Form>
   );

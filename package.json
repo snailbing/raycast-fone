@@ -66,6 +66,14 @@
       "placeholder": "cookie"
     },
     {
+      "name": "workHour",
+      "type": "textfield",
+      "required": false,
+      "title": "Fone defaule work hour",
+      "description": "The work hour defaule value.",
+      "placeholder": "work_hour"
+    },
+    {
       "name": "tickProjectId",
       "type": "textfield",
       "required": true,

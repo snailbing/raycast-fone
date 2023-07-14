@@ -69,6 +69,7 @@ export type Preferences = {
   cookie: string;
   tickCookie: string;
   tickProjectId: string;
+  workHour: string;
 };
 
 // projectId = 173746

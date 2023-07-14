@@ -16,6 +16,8 @@ type ExtensionPreferences = {
   "userName": string,
   /** Fone Cookie - The cookie value seen in the web request. */
   "cookie": string,
+  /** Fone defaule work hour - The work hour defaule value. */
+  "workHour"?: string,
   /** TickTick Project ID - The tick tick project_id value seen in the web request. */
   "tickProjectId": string,
   /** TickTick Cookie - The cookie value seen in the web request. */

@@ -154,6 +154,18 @@ export const taskIsCompleted = (task: any) => {
   return task.status == 2;
 };
 
+/**
+ * 这个 tick 任务是已经取消的
+ * @param task 
+ * @returns 
+ */
+export const tickTaskIsCancle = (task: any) => {
+  if (task == null) {
+    return false;
+  }
+  return task.status == -1;
+};
+
 export const taskFoneIsCreated = (task: any) => {
   if (task == null) {
     return false;

@@ -213,6 +213,15 @@ export const changTaskStateToComplated = async (taskId: string) => {
 };
 
 /**
+ * Fone 的任务取消
+ * @param taskId 
+ * @returns 
+ */
+export const changTaskStateToCancel = async (taskId: string) => {
+  return changTaskState(taskId, "32");
+};
+
+/**
  * 修改任务状态
  * @param projectId
  * @param taskId

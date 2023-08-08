@@ -1,6 +1,6 @@
 import { showToast, Toast, getPreferenceValues, List, Action, ActionPanel, Color, Icon } from "@raycast/api";
 import React, { useEffect, useMemo, useState } from "react";
-import { changTaskStateToComplated, createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
+import { changTaskStateToCancel, changTaskStateToComplated, createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import useStartApp from "./hooks/useStartApp";
 import {
   addFoneUrl2TickTask,
@@ -11,6 +11,7 @@ import {
   taskFoneIsCompleted,
   taskFoneIsCreated,
   taskIsCompleted,
+  tickTaskIsCancle,
 } from "./service/tickApi";
 import { projectDic } from "./create";
 
@@ -105,6 +106,22 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       } else {
         showToast(Toast.Style.Failure, "Failure", "已经完成的暂不支持再同步");
       }
+      return;
+    } else if (tickTaskIsCancle(task)) {
+      // 已经取消的
+      // 还有可能在FONE上都没有创建的
+      if (!taskFoneIsCreated(task)) {
+        console.log("滴答清单已经完成,但FONE上还没有的");
+        await tick2Fone(task);
+      }
+      // 获得ID
+      const itemId = getFoneItemIdByTickTask(task);
+      if (!itemId) {
+        console.log("没有获取到ItemId");
+        return;
+      }
+      console.log("获得itemId " + itemId);
+      await changTaskStateToCancel(itemId);
       return;
     }
     const success = await tick2Fone(task);

@@ -12,6 +12,8 @@ import {
   taskFoneIsCreated,
   taskIsCompleted,
   tickTaskIsCancle,
+  tickTaskIsCompleted,
+  updateTickTaskAssignee,
 } from "./service/tickApi";
 import { projectDic } from "./create";
 
@@ -87,7 +89,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
   };
 
   const syncOneEvent2Fone = async (task: any) => {
-    if (taskIsCompleted(task)) {
+    if (tickTaskIsCompleted(task)) {
       if (!taskFoneIsCompleted(task)) {
         // 还有可能在FONE上都没有创建的
         if (!taskFoneIsCreated(task)) {
@@ -102,7 +104,8 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
         }
         console.log("获得itemId " + itemId);
         await changTaskStateToComplated(itemId);
-        await completedTickTask(task, itemId);
+        // await completedTickTask(task, itemId);
+        await updateTickTaskAssignee(task, itemId);
       } else {
         showToast(Toast.Style.Failure, "Failure", "已经完成的暂不支持再同步");
       }
@@ -122,6 +125,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       }
       console.log("获得itemId " + itemId);
       await changTaskStateToCancel(itemId);
+      await updateTickTaskAssignee(task, itemId);
       return;
     }
     const success = await tick2Fone(task);

@@ -138,6 +138,11 @@ export const completedTickTask = async (task: any, id: number) => {
   return updateTickFoneOneTask(task);
 };
 
+export const updateTickTaskAssignee = async (task: any, id: number) => {
+  task.assignee = id ? id : 1;
+  return updateTickFoneOneTask(task);
+};
+
 const isTheTaskByFoneUrl = (task: any, foneUrl: string) => {
   if (!task) {
     return false;
@@ -147,7 +152,7 @@ const isTheTaskByFoneUrl = (task: any, foneUrl: string) => {
   }
 };
 
-export const taskIsCompleted = (task: any) => {
+export const tickTaskIsCompleted = (task: any) => {
   if (task == null) {
     return false;
   }

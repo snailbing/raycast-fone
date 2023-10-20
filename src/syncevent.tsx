@@ -4,13 +4,11 @@ import { changTaskStateToCancel, changTaskStateToComplated, createTaskAndEditWee
 import useStartApp from "./hooks/useStartApp";
 import {
   addFoneUrl2TickTask,
-  completedTickTask,
   findTickFoneCompletedUnSyncTask,
   findTickFoneUnSyncTask,
   getFoneItemIdByTickTask,
   taskFoneIsCompleted,
   taskFoneIsCreated,
-  taskIsCompleted,
   tickTaskIsCancle,
   tickTaskIsCompleted,
   updateTickTaskAssignee,

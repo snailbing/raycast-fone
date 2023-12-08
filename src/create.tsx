@@ -40,6 +40,7 @@ export const productDic = new Map<string, string>([
   ["17021", "住院"],
   ["16001", "HBOS"],
   ["16006", "浙一HIS"],
+  ["16007", "天台HIS"],
 ]);
 
 const gnNode = (myMap: Map<string, string>) => {

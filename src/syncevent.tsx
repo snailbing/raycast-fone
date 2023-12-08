@@ -70,7 +70,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     const params = {
       title: element.title,
       project: projectInfo,
-      product: { value: "16001", label: "HBOS" },
+      product: { value: "16007", label: "天台HIS" },
       workHour: workHour,
       description: element.content,
     };

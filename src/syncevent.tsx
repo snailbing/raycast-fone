@@ -76,7 +76,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     };
     const itemId = await createTaskAndEditWeekWork(params);
     if (itemId == null) {
-      showToast(Toast.Style.Failure, "Failure", element.summary);
+      console.log("创建 FONE 任务失败" + element.title);
       // success = false;
       return false;
     }
@@ -131,7 +131,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     if (success) {
       showToast(Toast.Style.Success, "Success", "Sync Calendar Event To Fone Tasks Success");
     } else {
-      showToast(Toast.Style.Failure, "Failure", "失败了请检查滴答清单与FONEß");
+      // showToast(Toast.Style.Failure, "Failure", "失败了请检查滴答清单与FONE。");
     }
   };
 

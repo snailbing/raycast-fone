@@ -117,7 +117,12 @@ const getFoneTasks = async (keyword?: string | null) => {
       responseType: "json",
     })
     .json();
-  return (response as any).data.records;
+    if (response && (response as any).success == true) {
+      return (response as any).data.records;
+    } else {
+      console.log(response)
+      showToast(Toast.Style.Failure, "Failure", (response as any).message);
+    }
 };
 
 export const getToday = async () => {
@@ -333,6 +338,9 @@ export const createTaskAndEditWeekWork = async (params: any) => {
     await editThisWeekItem(relationId, params.description, params.workHour);
 
     return itemId;
+  } else {
+    console.log(response)
+    showToast(Toast.Style.Failure, "Failure", (response as any).message);
   }
 
   return null;

@@ -104,15 +104,17 @@ const getFoneTasks = async (keyword?: string | null) => {
     query.title = keyword;
   }
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/workItem/memoryPage", {
+    .post("https://fone.come-future.com/eip-fone/v2/workItem/memoryPage", {
       json: {
-        type: 3,
-        fieldSource: 3,
+        // type: 3,
+        // fieldSource: 3,
         projectId: projectId,
         queryWrapper: query,
         current: 1,
         pageSize: 200,
         viewType: 1,
+        // 这是视图的 ID
+        workitemViewId: "10024560",
       },
       responseType: "json",
     })
@@ -184,7 +186,7 @@ export const getProjects = async () => {
 
 export const createTask = async (params: any) => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/workItem/create", {
+    .post("https://fone.come-future.com/eip-fone/v2/workItem/create", {
       json: {
         fields: {
           title: params["title"],
@@ -235,7 +237,7 @@ export const changTaskStateToCancel = async (taskId: string) => {
  */
 export const changTaskState = async (taskId: string, state: string) => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/workItem/editState", {
+    .post("https://fone.come-future.com/eip-fone/v2/workItem/editState", {
       json: {
         workItemId: taskId,
         state: state,
@@ -308,9 +310,13 @@ export const editThisWeekItem = async (relationId: string, remark: string, workH
 
 export const createTaskAndEditWeekWork = async (params: any) => {
   const response = await createTask(params);
-
+  console.log("create fone task: " +  JSON.stringify(response))
   if (response && response.success == true) {
-    let itemId = response.data.id;
+    let itemId = response.data;
+    if(response.data.id) {
+      itemId = response.data.id;
+    }
+    console.log("item id:" + itemId)
     await addToThisWeek(itemId);
     const currentWeekResponse = await getCurrentWeekId();
     let currentWeekData = (currentWeekResponse as any).data;
@@ -332,11 +338,11 @@ export const createTaskAndEditWeekWork = async (params: any) => {
         return;
       }
     });
-
+    console.log("week id:" + weekId)
     const items = await getThisWeekList(weekId);
     const relationId = items.get(itemId) as string;
-    await editThisWeekItem(relationId, params.description, params.workHour);
-
+    let editRes = await editThisWeekItem(relationId, params.description, params.workHour);
+    console.log("edit week item info: " +  JSON.stringify(editRes))
     return itemId;
   } else {
     console.log(response)

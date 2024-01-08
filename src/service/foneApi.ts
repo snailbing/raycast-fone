@@ -308,6 +308,36 @@ export const editThisWeekItem = async (relationId: string, remark: string, workH
   return response as any;
 };
 
+export const add2ThisWeekAndEditWorkHour = async (itemId: string, description: string, workHour: string) => {
+  console.log("item id:" + itemId)
+  await addToThisWeek(itemId);
+  const currentWeekResponse = await getCurrentWeekId();
+  let currentWeekData = (currentWeekResponse as any).data;
+  let weekId = "";
+  const timeInterval = new Date().getTime();
+  currentWeekData.map((item: any) => {
+    /*
+        cycleCode:"2023:18"
+        cycleTitle:"2023年第18周0424-0430"
+        endTime:"2023-04-30 23:59:59"
+        id:"10002001"
+        sortIndex:null
+        startTime:"2023-04-24 00:00:00"
+        */
+    let tempStart = new Date(item.startTime).getTime();
+    let tempStop = new Date(item.endTime).getTime();
+    if (tempStart! < timeInterval && timeInterval < tempStop!) {
+      weekId = item.id;
+      return;
+    }
+  });
+  console.log("week id:" + weekId)
+  const items = await getThisWeekList(weekId);
+  const relationId = items.get(itemId) as string;
+  let editRes = await editThisWeekItem(relationId, description, workHour);
+  console.log("edit week item info: " +  JSON.stringify(editRes))
+}
+
 export const createTaskAndEditWeekWork = async (params: any) => {
   const response = await createTask(params);
   console.log("create fone task: " +  JSON.stringify(response))
@@ -316,33 +346,7 @@ export const createTaskAndEditWeekWork = async (params: any) => {
     if(response.data.id) {
       itemId = response.data.id;
     }
-    console.log("item id:" + itemId)
-    await addToThisWeek(itemId);
-    const currentWeekResponse = await getCurrentWeekId();
-    let currentWeekData = (currentWeekResponse as any).data;
-    let weekId = "";
-    const timeInterval = new Date().getTime();
-    currentWeekData.map((item: any) => {
-      /*
-          cycleCode:"2023:18"
-          cycleTitle:"2023年第18周0424-0430"
-          endTime:"2023-04-30 23:59:59"
-          id:"10002001"
-          sortIndex:null
-          startTime:"2023-04-24 00:00:00"
-          */
-      let tempStart = new Date(item.startTime).getTime();
-      let tempStop = new Date(item.endTime).getTime();
-      if (tempStart! < timeInterval && timeInterval < tempStop!) {
-        weekId = item.id;
-        return;
-      }
-    });
-    console.log("week id:" + weekId)
-    const items = await getThisWeekList(weekId);
-    const relationId = items.get(itemId) as string;
-    let editRes = await editThisWeekItem(relationId, params.description, params.workHour);
-    console.log("edit week item info: " +  JSON.stringify(editRes))
+    await add2ThisWeekAndEditWorkHour(itemId, params.description, params.workHour);
     return itemId;
   } else {
     console.log(response)

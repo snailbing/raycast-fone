@@ -1,6 +1,6 @@
 import { showToast, Toast, getPreferenceValues, List, Action, ActionPanel, Color, Icon } from "@raycast/api";
 import React, { useEffect, useMemo, useState } from "react";
-import { changTaskStateToCancel, changTaskStateToComplated, createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
+import { add2ThisWeekAndEditWorkHour, changTaskStateToCancel, changTaskStateToComplated, createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
 import useStartApp from "./hooks/useStartApp";
 import {
   addFoneUrl2TickTask,
@@ -81,7 +81,7 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       return false;
     }
     const taskUrl = "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
-    console.log("添加urltotick" + taskUrl);
+    console.log("添加urltotick: " + taskUrl);
     await addFoneUrl2TickTask(element, taskUrl);
     return true;
   };
@@ -90,7 +90,8 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     if (tickTaskIsCompleted(task)) {
       if (!taskFoneIsCompleted(task)) {
         // 还有可能在FONE上都没有创建的
-        if (!taskFoneIsCreated(task)) {
+        let foneTaskIsCreated = taskFoneIsCreated(task);
+        if (!foneTaskIsCreated) {
           console.log("滴答清单已经完成,但FONE上还没有的");
           await tick2Fone(task);
         }
@@ -101,6 +102,10 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
           return;
         }
         console.log("获得itemId " + itemId);
+        if(foneTaskIsCreated){
+          // 还有一种可能，FONE 上是已经创建了任务，但是历史创建的没有加到本周的工作中，那这儿处理
+          await add2ThisWeekAndEditWorkHour(itemId, task.content, workHour);
+        }
         await changTaskStateToComplated(itemId);
         // await completedTickTask(task, itemId);
         await updateTickTaskAssignee(task, itemId);

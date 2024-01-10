@@ -308,9 +308,7 @@ export const editThisWeekItem = async (relationId: string, remark: string, workH
   return response as any;
 };
 
-export const add2ThisWeekAndEditWorkHour = async (itemId: string, description: string, workHour: string) => {
-  console.log("item id:" + itemId)
-  await addToThisWeek(itemId);
+export const getThisWeekRelationIdByItemId = async (itemId: string) => {
   const currentWeekResponse = await getCurrentWeekId();
   let currentWeekData = (currentWeekResponse as any).data;
   let weekId = "";
@@ -334,6 +332,15 @@ export const add2ThisWeekAndEditWorkHour = async (itemId: string, description: s
   console.log("week id:" + weekId)
   const items = await getThisWeekList(weekId);
   const relationId = items.get(itemId) as string;
+  return relationId;
+}
+
+export const add2ThisWeekAndEditWorkHour = async (itemId: string, description: string, workHour: string) => {
+  console.log("item id:" + itemId)
+  await addToThisWeek(itemId);
+  // 上面添加，下面获取关联 ID
+  const relationId = await getThisWeekRelationIdByItemId(itemId);
+  console.log("relationId id:" + relationId)
   let editRes = await editThisWeekItem(relationId, description, workHour);
   console.log("edit week item info: " +  JSON.stringify(editRes))
 }

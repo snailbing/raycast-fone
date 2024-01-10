@@ -1,6 +1,6 @@
 import { showToast, Toast, getPreferenceValues, List, Action, ActionPanel, Color, Icon } from "@raycast/api";
 import React, { useEffect, useMemo, useState } from "react";
-import { add2ThisWeekAndEditWorkHour, changTaskStateToCancel, changTaskStateToComplated, createTaskAndEditWeekWork, Preferences } from "./service/foneApi";
+import { add2ThisWeekAndEditWorkHour, changTaskStateToCancel, changTaskStateToComplated, createTaskAndEditWeekWork, getThisWeekRelationIdByItemId, Preferences } from "./service/foneApi";
 import useStartApp from "./hooks/useStartApp";
 import {
   addFoneUrl2TickTask,
@@ -77,34 +77,40 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     const itemId = await createTaskAndEditWeekWork(params);
     if (itemId == null) {
       console.log("创建 FONE 任务失败" + element.title);
-      // success = false;
-      return false;
+      return itemId;
     }
     const taskUrl = "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?workItemId=" + itemId;
     console.log("添加urltotick: " + taskUrl);
     await addFoneUrl2TickTask(element, taskUrl);
-    return true;
+    return itemId;
   };
 
   const syncOneEvent2Fone = async (task: any) => {
     if (tickTaskIsCompleted(task)) {
       if (!taskFoneIsCompleted(task)) {
         // 还有可能在FONE上都没有创建的
+        let itemId = null;
         let foneTaskIsCreated = taskFoneIsCreated(task);
         if (!foneTaskIsCreated) {
           console.log("滴答清单已经完成,但FONE上还没有的");
-          await tick2Fone(task);
+          itemId = await tick2Fone(task);
         }
         // 获得ID
-        const itemId = getFoneItemIdByTickTask(task);
+        if (!itemId) {
+          itemId = getFoneItemIdByTickTask(task);
+        }
         if (!itemId) {
           console.log("没有获取到ItemId");
           return;
         }
         console.log("获得itemId " + itemId);
         if(foneTaskIsCreated){
-          // 还有一种可能，FONE 上是已经创建了任务，但是历史创建的没有加到本周的工作中，那这儿处理
-          await add2ThisWeekAndEditWorkHour(itemId, task.content, workHour);
+          const relationId = await getThisWeekRelationIdByItemId(itemId);
+          console.log("判断任务是不是添加到本周收藏里，关联 ID：" + relationId)
+          if (!relationId) {
+            // 还有一种可能，FONE 上是已经创建了任务，但是历史创建的没有加到本周的工作中，那这儿处理
+            await add2ThisWeekAndEditWorkHour(itemId, task.content, workHour);
+          }
         }
         await changTaskStateToComplated(itemId);
         // await completedTickTask(task, itemId);
@@ -116,12 +122,15 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
     } else if (tickTaskIsCancle(task)) {
       // 已经取消的
       // 还有可能在FONE上都没有创建的
+      let itemId = null;
       if (!taskFoneIsCreated(task)) {
         console.log("滴答清单已经完成,但FONE上还没有的");
-        await tick2Fone(task);
+        itemId = await tick2Fone(task);
       }
       // 获得ID
-      const itemId = getFoneItemIdByTickTask(task);
+      if (!itemId) {
+        itemId = getFoneItemIdByTickTask(task);
+      }
       if (!itemId) {
         console.log("没有获取到ItemId");
         return;
@@ -131,9 +140,9 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       await updateTickTaskAssignee(task, itemId);
       return;
     }
-    const success = await tick2Fone(task);
+    const itemId = await tick2Fone(task);
 
-    if (success) {
+    if (itemId) {
       showToast(Toast.Style.Success, "Success", "Sync Calendar Event To Fone Tasks Success");
     } else {
       // showToast(Toast.Style.Failure, "Failure", "失败了请检查滴答清单与FONE。");

@@ -48,10 +48,10 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
 
   const isLoading = useMemo(() => {
     if (!isInitCompleted) {
-      console.log("aaaaaaaaaaa", allEvents == null);
+      console.log("初始化未完成，资源内容是否为空：", allEvents == null);
       return allEvents == null;
     }
-    console.log("bbbbbbbbb", allEvents == null);
+    console.log("资源加载完成，内容是否为空：", allEvents == null);
     return allEvents == null;
   }, [isInitCompleted, allEvents]);
 

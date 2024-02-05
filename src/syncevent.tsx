@@ -4,11 +4,14 @@ import { add2ThisWeekAndEditWorkHour, changTaskStateToCancel, changTaskStateToCo
 import useStartApp from "./hooks/useStartApp";
 import {
   addFoneUrl2TickTask,
+  clearTickTaskAssignee,
+  findTickFoneAssigneeTask,
   findTickFoneCompletedUnSyncTask,
   findTickFoneUnSyncTask,
   getFoneItemIdByTickTask,
   taskFoneIsCompleted,
   taskFoneIsCreated,
+  tickTaskIsAssignee,
   tickTaskIsCancle,
   tickTaskIsCompleted,
   updateTickTaskAssignee,
@@ -139,6 +142,10 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
       await changTaskStateToCancel(itemId);
       await updateTickTaskAssignee(task, itemId);
       return;
+    } else if (tickTaskIsAssignee(task)) {
+      let tData = await clearTickTaskAssignee(task);
+      console.log("clear tick assignee :" + JSON.stringify(tData))
+      return;
     }
     const itemId = await tick2Fone(task);
 
@@ -183,6 +190,26 @@ const SyncEvent: React.FC<Record<string, never>> = () => {
               onAction={async () => {
                 setAllEvents(null);
                 const tickEvents = await findTickFoneCompletedUnSyncTask();
+                console.log(tickEvents);
+                setAllEvents(tickEvents);
+              }}
+            />
+          </ActionPanel>
+        }
+      />
+
+    <List.Item
+        key={"clear tick assignee"}
+        title={"清除滴答清单中没有完成任务并已经标志关联FONE了"}
+        icon={{ source: Icon.CircleFilled, tintColor: Color.Red }}
+        actions={
+          <ActionPanel>
+            <Action
+              title="刷新"
+              icon={Icon.Circle}
+              onAction={async () => {
+                setAllEvents(null);
+                const tickEvents = await findTickFoneAssigneeTask();
                 console.log(tickEvents);
                 setAllEvents(tickEvents);
               }}

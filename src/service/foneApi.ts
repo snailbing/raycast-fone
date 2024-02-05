@@ -62,6 +62,10 @@ const getDateListData = async (command: string) => {
   }
 };
 
+export const Fone_Prefix = 'https://fone.come-future.com';
+export const Fone_API_Prefix = 'https://fone.come-future.com/eip-fone';
+export const Fone_Task_Prefix = Fone_Prefix + '/fone/projectDetail/task/';
+
 export type Preferences = {
   projectId: string;
   userId: string;
@@ -85,8 +89,8 @@ const client = got.extend({
     Connection: "keep-alive",
     "Content-Type": "application/json; charset=UTF-8",
     Cookie: cookie,
-    Origin: "https://fone.come-future.com",
-    Referer: "https://fone.come-future.com/fone/projectDetail/task/" + projectId + "?state=%5B%221%22%2C%224%22%5D",
+    Origin: Fone_Prefix,
+    Referer: Fone_Task_Prefix + projectId + "?state=%5B%221%22%2C%224%22%5D",
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "same-origin",
@@ -104,7 +108,7 @@ const getFoneTasks = async (keyword?: string | null) => {
     query.title = keyword;
   }
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/v2/workItem/memoryPage", {
+    .post(Fone_API_Prefix + "/v2/workItem/memoryPage", {
       json: {
         // type: 3,
         // fieldSource: 3,
@@ -157,7 +161,7 @@ export const getSearchByKeyword = async (keyword: string | null) => {
 
 export const getProjectTree = async () => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/dictionary/getProjectTree", {
+    .post(Fone_API_Prefix + "/dictionary/getProjectTree", {
       json: {},
       responseType: "json",
     })
@@ -186,7 +190,7 @@ export const getProjects = async () => {
 
 export const createTask = async (params: any) => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/v2/workItem/create", {
+    .post(Fone_API_Prefix + "/v2/workItem/create", {
       json: {
         fields: {
           title: params["title"],
@@ -237,7 +241,7 @@ export const changTaskStateToCancel = async (taskId: string) => {
  */
 export const changTaskState = async (taskId: string, state: string) => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/v2/workItem/editState", {
+    .post(Fone_API_Prefix + "/v2/workItem/editState", {
       json: {
         workItemId: taskId,
         state: state,
@@ -253,7 +257,7 @@ export const changTaskState = async (taskId: string, state: string) => {
 
 export const addToThisWeek = async (itemId: string) => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/view/addItem", {
+    .post(Fone_API_Prefix + "/view/addItem", {
       json: {
         collectChildRequirement: false,
         collectChildTask: false,
@@ -268,7 +272,7 @@ export const addToThisWeek = async (itemId: string) => {
 
 export const getCurrentWeekId = async () => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/view/cycleList", {
+    .post(Fone_API_Prefix + "/view/cycleList", {
       json: {},
       responseType: "json",
     })
@@ -278,7 +282,7 @@ export const getCurrentWeekId = async () => {
 
 export const getThisWeekList = async (cycldId: string) => {
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/view/listItem", {
+    .post(Fone_API_Prefix + "/view/listItem", {
       json: {
         cycleId: cycldId,
         viewId: "0",
@@ -295,10 +299,18 @@ export const getThisWeekList = async (cycldId: string) => {
 };
 
 export const editThisWeekItem = async (relationId: string, remark: string, workHour: string) => {
+  if(remark && remark.includes(Fone_Task_Prefix)) {
+    remark = remark.split(Fone_Task_Prefix)[0]
+  }
+  if(remark) {
+    remark = remark.trim();
+  }
+  console.log("edit week item relationId:" + relationId + " workHour:" + workHour + " remark:" + remark)
   const response = await client
-    .post("https://fone.come-future.com/eip-fone/view/editItem", {
+    .post(Fone_API_Prefix + "/view/editItem", {
       json: {
         relationId: relationId,
+        progress: remark,
         remark: remark,
         workHour: workHour,
       },

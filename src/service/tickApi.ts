@@ -1,7 +1,7 @@
 import got from "got";
 import { formatToServerDate } from "../utils/date";
 import { getPreferenceValues } from "@raycast/api";
-import { Preferences } from "./foneApi";
+import { Fone_Task_Prefix, Preferences } from "./foneApi";
 
 // const tickCookie =
 // "t=43A001113F9d610FF929A7FD2B9E37F35062D86B403CEFB15B4530564EDA7A2EAF98FE8DEC1D504C5A136FBA6D201C5CDF194970EBDBE64D7CDE80B40E7C0E502E40E18CB96B7BA33555C8DFAEAC655664256F6B515CF4CE07E8CD4122BA82EE17E5881C8DE09837D18F74D85BCEA6D59151002FFD8A511410766933FA30BF206BED1AF8B780AA0DBB3FD0CC4AE5A14E6A772473DE8707950E4A50BD170D67100619F77295F1B5393C31190CEFC02B558; AWSALB=XAPL9/7zI/ya+YBpbMMAh41SMcXXPAO/84boVoMeSR9PS7snOSZu1wg0Z2Go4iJpB9gAJRoazfcnL2cBJ2Jx48IPAVzD6n+c76FBTwscUhRcbRiqXcQhdhv6WQjl; AWSALBCORS=XAPL9/7zI/ya+YBpbMMAh41SMcXXPAO/84boVoMeSR9PS7snOSZu1wg0Z2Go4iJpB9gAJRoazfcnL2cBJ2Jx48IPAVzD6n+c76FBTwscUhRcbRiqXcQhdhv6WQjl";
@@ -103,6 +103,21 @@ export const findTickFoneUnSyncTask = async () => {
   return tasks;
 };
 
+export const findTickFoneAssigneeTask = async () => {
+  let tasks = await getTickFoneTasks();
+  tasks = tasks.filter((task: any) => {
+    return task.assignee;
+  });
+  return tasks;
+};
+
+export const tickTaskIsAssignee = (task: any) => {
+  if (task == null) {
+    return false;
+  }
+  return task.assignee;
+};
+
 export const findTickFoneCompletedUnSyncTask = async () => {
   let tasks = await getTickCompletedTasks();
   tasks = tasks.filter((task: any) => {
@@ -143,6 +158,12 @@ export const updateTickTaskAssignee = async (task: any, id: number) => {
   return updateTickFoneOneTask(task);
 };
 
+export const clearTickTaskAssignee = async (task: any) => {
+  // task.assignee = undefined;
+  task.assignee = 0;
+  return updateTickFoneOneTask(task);
+};
+
 const isTheTaskByFoneUrl = (task: any, foneUrl: string) => {
   if (!task) {
     return false;
@@ -175,7 +196,7 @@ export const taskFoneIsCreated = (task: any) => {
   if (task == null) {
     return false;
   }
-  return task.desc || task.content.includes("https://fone.come-future.com");
+  return task.desc || task.content.includes(Fone_Task_Prefix);
 };
 
 export const taskFoneIsCompleted = (task: any) => {
